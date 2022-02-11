@@ -1,0 +1,97 @@
+#!/bin/bash
+
+###########################################
+##       Configuracion del trabajo       ##
+###########################################
+
+## COMANDOS OBLIGATORIOS (Los comandos de SLURM empiezan por #)
+## Solicitudes de acceso: http://ccar.uned.es (Manual y otros)
+## Nombre del trabajo (J=Job)
+#SBATCH -J test
+
+## Nombre del log de salida
+#SBATCH -o %x.out
+
+## Nombre del log de error
+#SBATCH -e %x.err
+
+## Número de hilos reservados para el trabajo (1 o 2)
+#SBATCH --ntasks=2
+
+
+## COMANDOS OPCIONALES
+
+## Especifica a qué cola se mandará el trabajo
+## Si se omite se mandará a cualquier cola libre en la que el usuario tenga permiso
+##SBATCH --partition ALPHA
+
+## Especifica el nodo al que se manda el trabajo
+## Si se omite se mandará al nodo más descargado accesible al usuario (Quitar una almoadilla)
+##SBATCH --nodelist=compute-0-0
+
+###############################
+##    Comandos a ejecutar    ##
+###############################
+
+## CARGAR LOS MÓDULOS NECESARIOS (OPCIONAL) 
+
+## Para ver los módulos disponibles
+## module avail (da como resultado:)
+##
+##------------------------------------------ /share/modules ------------------------------------------
+##binutils/2.36                                gromacs/2019.4
+##binutils/2.36-gcc-9.3                        intel/oneapi
+##cmake/3.21.4                                 lammps/29Sep21_gcc9.3_cuda11.4_fftw3.3.9_omp
+##CUDA/11.4                                    octave/6.3.0
+##CUDA/9.0                                     openmpi/4.0.4
+##fftw/3.3.9                                   python/3.10.1
+##gaussian/g16                                 R/4.1.1
+##gaussian/g16_2021                            R/4.1.2
+##gcc/9.2                                      RandomPhase/2.0
+##gcc/9.3                                      siesta/4.0
+##---------------------------------- /usr/share/Modules/modulefiles ----------------------------------
+##dot              module-info      null             opt-python       rocks-openmpi_ib
+##module-git       modules          opt-perl         rocks-openmpi    use.own
+##----------------------------------------- /etc/modulefiles -----------------------------------------
+##mpi/openmpi-x86_64
+
+## Para ver los módulos cargados
+## module list
+
+## Para quitar los modulos no usados
+## module unload MODULO_NO_DESEADO
+
+## Para cargar los modulos necesarios
+## module load MODULO_DESEADO
+
+## COPIAR FICHEROS AL DIRECTORIO TEMPORAL Y TRASLADARSE A ÉL
+cp -r $SLURM_SUBMIT_DIR/* $TMPDIR
+cd $TMPDIR
+
+## ----------- EJECUCIÓN DEL PROGRAMA ----------
+
+## Ejemplo 1. Trabajo en serie
+##echo "Hello World" >> ./serie.txt
+##sleep 10
+
+## Ejemplo 2. Trabajo en paralelo
+##./OMPTest > ./omp.txt
+##sleep 10
+
+## Ejemplo 3. Trabajo en paralelo
+echo $SLURM_NTASKS >> mpi.txt
+mpirun -np $SLURM_NTASKS ./MPIexample > mpi.txt
+sleep 20
+
+## ----------- FIN DE EJECUCIÓN DEL PROGRAMA ----------
+
+## COPIAR LA INFORMACIÓN AL DIRECTORIO DE USUARIO
+OUTDIR="$SLURM_SUBMIT_DIR/$SLURM_JOB_ID"
+mkdir -p $OUTDIR
+cp -r * $OUTDIR
+
+## para lanzar el trabajo se utiliza el comando "sbatch NOMBRE_DEL_TRABAJO.job" que nos devuelve el ID del trabajo
+## Para ver los trabajos en cola se usa "squeue"
+## Para cancelar un trabajo "scancel ID_TRABAJO"
+## Para ver el estado "sstratus"
+

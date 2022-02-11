@@ -7,7 +7,7 @@
 ## COMANDOS OBLIGATORIOS (Los comandos de SLURM empiezan por #)
 ## Solicitudes de acceso: http://ccar.uned.es (Manual y otros)
 
-## Test 2
+## Eliminamos los cambios
 
 ## Nombre del trabajo (J=Job)
 #SBATCH -J test
